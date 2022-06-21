@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2 style="color: red;" class="center">Conver mix text to RTL</h2>
+<br/>
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+   padding: 10px;
+}
+</style>
+<div class="center">
+<label>Input Text</label>
+<br>
+<textarea  style="height: 90px;" id="inputtext" class="center"></textarea>
+<br>
+<button  class="center "onclick=test()>Conver&Copy</button>
+<br/>
+
+<label>Output Text</label>
+<br>
+<textarea style="height: 90px;" id= "output" class="center"></textarea>
+</div>
+
+<p id="demo"></p>
+<script>
+ const calc=(textValue)=>{
+ 
+     let isRTLFormat = false;
+     let virtulArray = [];
+     let virtualString = "";
+     console.log (textValue);
+     let originalTextArray = textValue?.split(' ');
+     originalTextArray = originalTextArray?.filter(f => f.trim() != " " && f != '');
+     console.log (originalTextArray);
+     if (originalTextArray?.length) {
+         let temp = [];
+         let englishWords= [];
+         let numbers = [];
+         let numberExist= false;
+         for (let i = 0; i < originalTextArray.length; i++) {
+             isRTLFormat = isRightToLeft(originalTextArray[i]);
+             // If in right to left format
+             if (isRTLFormat) {
+                 // If a few English words had already been found
+                 if (englishWords.length > 1) {
+                     temp.unshift(concatItems(englishWords));
+                     virtulArray.unshift(...temp);
+                     temp = [];
+                     englishWords = [];
+                 }
+                 // If only one English word was found
+                 else if (englishWords.length > 0) {
+                     temp.unshift(englishWords[0]);
+                     virtulArray.unshift(...temp);
+                     temp = [];
+                     englishWords = [];
+                 }
+                 // Add right to left word to end of array
+                 temp.push(originalTextArray[i]);
+             }
+             else {
+                 // If the word is not number
+                 if (!parseInt(originalTextArray[i])) {
+                     englishWords.push(originalTextArray[i]);
+                     if (numberExist) {
+                         temp.unshift(englishWords[0]);
+                         virtulArray.unshift(...temp);
+                         temp = [];
+                         englishWords = [];
+                         numberExist = false;
+                     }
+                 }
+                 // If the word is number
+                 else {
+                     temp.push(originalTextArray[i]);
+                     numberExist = true;
+                 }
+             }
+         }
+         // Add the last word or words to the array
+         if (temp.length > 0) {
+             virtulArray.unshift(...temp);
+             temp = [];
+         }
+         if (englishWords.length > 0) {
+             temp.unshift(concatItems(englishWords));
+             virtulArray.unshift(...temp);
+         }
+         let concatedArray = [];
+         concatedArray = concatItems(virtulArray);
+         virtualString = "// " + concatedArray.join(' ');
+         console.log(virtualString);
+		 document.getElementById("output").innerHTML=virtualString;
+         var copyText = document.getElementById("output");
+
+  /* Select the text field */
+  copyText.select();
+ // copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+  /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.value);
+  
+  /* Alert the copied text */
+  alert("Copied the text: " + copyText.value);
+
+         //vscode.env.clipboard.writeText(virtualString);
+         // window.showInformationMessage("The text is converted and copied to the clipboard.").then((dismis)=>dismis);
+
+     }
+ }
+const test=()=>{
+var x= document.getElementById('inputtext').value;
+calc(x);
+
+}
+
+   function isRightToLeft(text) {
+        let isRTL = false;
+        const RTL_Regex = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+        for (let i = 0; i < text.length; i++) {
+            const element = text.charCodeAt(i);
+            if (RTL_Regex.test(String.fromCharCode(element))) {
+                isRTL = true;
+                break
+            }
+        }
+        return isRTL;
+    }
+    function concatItems(array) {
+        let concatedArray=[];
+        console.log("concatItems="+array);
+        for (let z = 0; z < array.length; z++) {
+            concatedArray = concatedArray.concat(array[z]);
+        }
+        return concatedArray;
+    }
+</script
+
+
+</body>
+</html>
